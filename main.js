@@ -1,44 +1,39 @@
 define(function(require, exports, module) {
     "use-strict";
     
+    // get the modules we'll be using from brackets
+    var AppInit = brackets.getModule("utils/AppInit");
     var CommandManager = brackets.getModule("command/CommandManager");
     var Menus = brackets.getModule("command/Menus");
+    var EditorManager = brackets.getModule("editor/EditorManager");
     
-    var ThreeJSCommandID = "hamdanjaveed.boilerplate.threejs";
+    // the unique identifiers used to trigger actions
+    var ThreeJSCommandID = "hamdanjaveed.snippets.threejs";
     
-    var insertThreeJSSnip = function() {
-        console.log(threejs);
-    }
-    
-    var AppInit = brackets.getModule("utils/AppInit");
+    // the threejs code snippet
     var threejs = require("text!threejs.snip");
     
+    // handle the three js insertion command
+    var insertThreeJSSnip = function() {
+        // get the current editor
+        var editor = EditorManager.getCurrentFullEditor();
+        // if the editor exits ...
+        if (editor) {
+            // ... get the insertion position
+            var insertionPosition = editor.getCursorPos();
+            // insert the code from threejs.snip into the editor
+            editor.document.replaceRange(threejs, insertionPosition);
+        }
+    }
+    
+    // when brackets has finished loading ...
     AppInit.appReady(function() {
+        // ... register the threejs menu command
         CommandManager.register("Three JS", ThreeJSCommandID, insertThreeJSSnip);
         
-        var boilerplateMenu = Menus.addMenu("Boilerplate", "hamdanjaveed.boilerplate");
-        boilerplateMenu.addMenuItem(ThreeJSCommandID, [{ "key": "Ctrl-3" }, { "key": "Cmd-3", "platform": "mac" }]);
+        // add a 'Snippets' menu into the main menu bar
+        var snippetsMenu = Menus.addMenu("Snippets", "hamdanjaveed.snippets");
+        // add a threejs menu item with a keyboard shortcut
+        snippetsMenu.addMenuItem(ThreeJSCommandID, {"key":"Ctrl-3"});
     });
-    
-    
-//    var CommandManager = brackets.getModule("command/CommandManager");
-//    var Menus = brackets.getModule("command/Menus");
-//    var EditorManager  = brackets.getModule("editor/EditorManager");
-//    
-//    function handleThreeJS() {
-//        var editor = EditorManager.getFocusedEditor();
-//        if (editor) {
-//            var insertionPos = editor.getCursorPos();
-//            editor.document.replaceRange(localStorage.getItem("threejs"), insertionPos);
-//        }
-//    }
-//    
-//    var COMMAND_ID = "hamdanjaveed.boilerplate";
-//    var THREE_JS_COMMAND_ID = COMMAND_ID + ".threejs";
-//    CommandManager.register("Three js", THREE_JS_COMMAND_ID, handleThreeJS);
-//    
-//    var menu = Menus.addMenu("Boilerplate", COMMAND_ID);
-//    menu.addMenuItem(THREE_JS_COMMAND_ID);
-//    
-//    exports.handleThreeJS = handleThreeJS;
 });
