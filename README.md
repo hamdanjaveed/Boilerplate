@@ -1,4 +1,4 @@
-Boilerplate
+Snippets
 ===========
 
 A brackets extension
