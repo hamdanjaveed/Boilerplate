@@ -14,7 +14,7 @@ define(function(require, exports, module) {
     var threejs = require("text!threejs.snip");
     
     // handle the three js insertion command
-    var insertThreeJSSnip = function() {
+    function insertThreeJSSnip() {
         // get the current editor
         var editor = EditorManager.getCurrentFullEditor();
         // if the editor exits ...
