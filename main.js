@@ -1,3 +1,5 @@
+// would like to eventually have snippets with parameters
+
 define(function(require, exports, module) {
     "use-strict";
     
@@ -12,41 +14,39 @@ define(function(require, exports, module) {
     var ThreeJSCommandID = "hamdanjaveed.snippets.threejs";
     
     // the threejs code snippet
-    var threejs = require("text!threejs.snip");
+    var snippets = require("lib/snippets");
     
-    // handle the three js insertion command
-    function insertThreeJSSnip() {
-        // get the current editor
-        var editor = EditorManager.getCurrentFullEditor();
-        // if the editor exits ...
-        if (editor) {
-            // ... get the insertion position
-            var insertionPosition = editor.getCursorPos();
-            // insert the code from threejs.snip into the editor
-            editor.document.replaceRange(threejs, insertionPosition);
-        }
+    function parseLine(line, cursorColumn) {
+        var words;
+        line = line.substring(0, cursorColumn);
+        words = line.split(/\W/);
+        return words[words.length - 1];
     }
     
     // handle a key event
     function handleKeyEvent($event, editor, event) {
+        var cursorPosition;
+        var line;
+        var snippetKey;
         if ((event.type === "keydown") && (event.keyCode === KeyEvent.DOM_VK_TAB)) {
-            console.log("Tab pressed!");
+            cursorPosition = editor.getCursorPos();
+            line = editor.document.getLine(cursorPosition.line);
+            snippetKey = parseLine(line, cursorPosition.ch);
+            if (snippets[snippetKey]) {
+                editor.document.replaceRange(snippets[snippetKey], {
+                    line: cursorPosition.line,
+                    ch: cursorPosition.ch - snippetKey.length
+                }, cursorPosition);
+                event.preventDefault();
+            }
         }
     }
     
     // when brackets has finished loading ...
     AppInit.appReady(function() {
-        // ... register the threejs menu command
-        CommandManager.register("Three JS", ThreeJSCommandID, insertThreeJSSnip);
-        
         var editor = EditorManager.getFocusedEditor();
         $(editor).on("keyEvent", handleKeyEvent);
         $(EditorManager).on("activeEditorChange", editorDidChange);
-        
-        // add a 'Snippets' menu into the main menu bar
-        var snippetsMenu = Menus.addMenu("Snippets", "hamdanjaveed.snippets");
-        // add a threejs menu item with a keyboard shortcut
-        snippetsMenu.addMenuItem(ThreeJSCommandID, {"key":"Ctrl-3"});
     });
     
     // handle an editor switch (when switching between files)
